@@ -1,10 +1,10 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Platform, Pressable } from 'react-native';
-import { Link, Href } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/constants/Colors';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Colors } from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Href, Link } from 'expo-router';
+import React from 'react';
+import { Animated, Pressable, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -15,20 +15,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
   const translateX = React.useRef(new Animated.Value(-300)).current;
+  const [rendered, setRendered] = React.useState(false);
 
   React.useEffect(() => {
+    if (isOpen) {
+      setRendered(true);
+    }
     Animated.spring(translateX, {
       toValue: isOpen ? 0 : -300,
       useNativeDriver: true,
       bounciness: 0,
-    }).start();
-  }, [isOpen]);
+    }).start(({ finished }) => {
+      if (!isOpen && finished) {
+        setRendered(false);
+      }
+    });
+  }, [isOpen, translateX]);
 
-  if (!isOpen) return null;
+  if (!rendered) return null;
 
   const menuItems: Array<{
     title: string;
-    icon: string;
+    icon: Parameters<typeof IconSymbol>[0]['name'];
     href: Href<any>;
   }> = [
     { title: 'Início', icon: 'house.fill', href: '/(tabs)' as Href<any> },
@@ -70,7 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         
         <View style={styles.menu}>
           {menuItems.map((item, index) => (
-            <Link key={index} href={item.href} asChild>
+            <Link key={index} href={item.href} onPress={onClose} asChild>
               <Pressable 
                 style={({ pressed }: { pressed: boolean }) => [
                   styles.menuItem,
@@ -79,7 +87,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 onPress={onClose}
               >
                 <IconSymbol 
-                  name={item.icon as any} 
+                  name={item.icon}
                   size={22} 
                   color={Colors[colorScheme ?? 'light'].text} 
                   style={styles.menuIcon} 
