@@ -1,14 +1,14 @@
+import { Sidebar } from '@/components/Sidebar';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Colors } from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useRef, useState } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { useState } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
 import 'react-native-reanimated';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Sidebar } from '@/components/Sidebar';
-import { Colors } from '@/constants/Colors';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -60,7 +60,7 @@ export default function RootLayout() {
         </Stack>
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         
-        <Sidebar isOpen={sidebarVisible} onClose={toggleSidebar} />
+        <Sidebar isOpen={sidebarVisible} onClose={() => setSidebarVisible(false)} />
       </View>
     </ThemeProvider>
   );
